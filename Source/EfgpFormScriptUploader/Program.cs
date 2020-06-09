@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
 
 namespace EfgpFormScriptUploader {
     class Program {
@@ -22,7 +21,6 @@ namespace EfgpFormScriptUploader {
         private static DataTable columnInformation;
         private static string oid;
         private static string formDesignerAjaxUrl;
-        private static IJavaScriptExecutor console;
 
         static int Main(string[] args) {
             try {
@@ -53,8 +51,9 @@ namespace EfgpFormScriptUploader {
                 browser.Navigate().GoToUrl(formDesignerAjaxUrl);
                 browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10000);
 
-                console = (IJavaScriptExecutor)browser;
-                console.ExecuteScript("DWREngine._execute(formDesignerAjax._path, 'formDesignerAjax', 'updateFormScript', '" + oid + "', '" + scriptCode.Replace("\\", "\\\\").Replace("'", "\\'").Replace(Environment.NewLine, "\\n") + "\\n\\n\\n', null );");
+                var uploadScript = "DWREngine.setAsync(false);\n";
+                uploadScript += "DWREngine._execute(formDesignerAjax._path, 'formDesignerAjax', 'updateFormScript', '" + oid + "', '" + scriptCode.Replace("\\", "\\\\").Replace("'", "\\'").Replace(Environment.NewLine, "\\n") + "\\n\\n\\n', null);";
+                browser.ExecuteScript(uploadScript);
 
                 Console.WriteLine("上傳完成");
 
